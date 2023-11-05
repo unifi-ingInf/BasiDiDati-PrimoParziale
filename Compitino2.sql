@@ -65,6 +65,19 @@ WHERE epa.n_esami = (
     SELECT max(n_esami) FROM esami_per_anno
     );
 
+--oppure
+
+SELECT s.matricola, s.nome, s.cognome
+FROM Studente s
+JOIN EsamiSostenuti es on s.matricola = es.studente
+GROUP BY s.matricola, s.nome, s.cognome
+having count(es.esame) >= ALL(
+    SELECT count(esame)
+    FROM EsamiSostenuti
+    GROUP BY studente, anno
+);
+
+
 
 -- QUERY 2
 WITH media_esami AS(
