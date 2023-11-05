@@ -81,6 +81,7 @@ SELECT s.descrizione, count(pt.posto) posti_prenotati
 FROM Spettacolo s 
 JOIN Programmazione pg ON s.codice = pg.spettacolo
 JOIN Prenotazione pt ON pg.data = pt.data 
+WHERE pg.data = '2006-12-15'
 GROUP BY s.codice, s.descrizione;
 
 -- QUERY 2
