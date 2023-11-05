@@ -108,13 +108,13 @@ CREATE TABLE Farmaco (
 
 SELECT COUNT(DISTINCT visita)
 FROM prescrizione
-WHERE farmaco <> “F018”
+WHERE farmaco <> 'F018'
 
 -- Query 2
 
 SELECT COUNT(DISTINCT visita)
 FROM DettaglioVisita
-WHERE controllo <> “C014”
+WHERE controllo <> 'C014'
 
 -- Query 3
 
