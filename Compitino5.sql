@@ -107,5 +107,5 @@ WITH prodotti_per_ordine AS(
     GROUP BY o.oin
 );
 
-SELECT ppo.oin, avg(ppo.somma_pezzi)
+SELECT avg(ppo.somma_pezzi)
 FROM prodotti_per_ordine ppo;
