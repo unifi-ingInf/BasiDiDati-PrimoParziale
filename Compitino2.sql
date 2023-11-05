@@ -50,3 +50,47 @@ attribuiti agli studenti
 3. Matricola degli studenti che hanno dato più di un esame nello stesso
 giorno
 */
+
+-- QUERY 1
+WITH esami_per_anno AS(
+    SELECT es.studente, count(*) n_esami
+    FROM EsamiSostenuti es
+    GROUP BY es.studente, es.anno
+)
+
+SELECT s.matricola, s.nome, s.cognome
+FROM studente s
+JOIN esami_per_anno epa on s.matricola = epa.studente
+WHERE epa.n_esami = (
+    SELECT max(n_esami) FROM esami_per_anno
+    );
+
+
+-- QUERY 2
+WITH media_esami AS(
+    SELECT es.esame, avg(es.voto) media
+    JOIN EsamiSostenuti es 
+    GROUP BY es.esame
+);
+
+select me.esame
+from media_esami me 
+where me.media = (
+    select min(media) FROM media_esami
+);
+
+--oppure
+
+select es.esame
+from  esamisostenuti es
+group by es.esame 
+having AVG(voto)<=all(
+    select AVG(voto) from esamisostenuti group by esame
+);
+
+-- QUERY 3
+SELECT es.studente studente
+from EsamiSostenuti es 
+group by es.studente, es.giorno, es.mese, es.anno
+having count(*) > 1
+
