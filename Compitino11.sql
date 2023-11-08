@@ -64,21 +64,26 @@ AND NOT IN (
 -- Query A2 
 
 WITH riparazioni_programmate(codice, n_rip_programmate) AS (
-    SELECT r.codice count(r.codice)
-    FROM riparazione r
-    WHERE programmata
+    SELECT a.modello, count(r.codice)
+    FROM Auto a
+    JOIN Riparazione r ON a.targa = r.auto
+    WHERE r.programmata
+    GROUP BY a.modello
 )
 
 WITH riparazioni_non_programmate(codice, n_rip_non_programmate) AS (
-    SELECT r.codice, count(r.codice)
-    FROM riparazione r
-    WHERE NOT programmata
+    SELECT a.modello, count(r.codice)
+    FROM Auto a
+    JOIN Riparazione r ON a.targa = r.auto
+    WHERE NOT r.programmata
+    GROUP BY a.modello
 )
 
 SELECT r.codice, rp.n_rip_programmate, rnp.n_rip_non_programmate
-FROM riparazione r
-JOIN riparazioni_programmate rp ON r.codice = rp.codice
+FROM modello m
+JOIN riparazioni_programmate rp ON m.codice = rp.codice
 JOIN riparazioni_non_programmate rnp; ON r.codice = rnp.codice
+GROUP BY m.codice
 
 -- Query A3
 
