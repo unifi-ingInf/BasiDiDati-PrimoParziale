@@ -17,8 +17,10 @@ nella tabella Auto e la chiave primaria della tabella Modello)
 
 Utente(cf, nome, cognome, indirizzo, telefono) 
 Auto(targa, data, modello)
-Modello(codice, produttore, tipo, cilindrata, alimentazione, peso, posti, garanzia)
-Riparazione(codice, data, auto, descrizione, programmata, costo) 
+Modello(codice, produttore, tipo, cilindrata, 
+    alimentazione, peso, posti, garanzia)
+Riparazione(codice, data, auto, descrizione, 
+    programmata, costo) 
 Proprietario(auto, utente)
 DettaglioRiparazione(riparazione, intervento) 
 Intervento(codice, descrizione, costo_standard)
@@ -38,8 +40,8 @@ stato fatto in una riparazione
 B2. Per ciascun modello di auto presente nella tabella Modello, il numero di
 riparazioni non programmate effettuate ed il costo complessivo di tali
 riparazioni
-B3. Codice e descrizione dell'intervento più frequente nelle auto del
-produttore BMW
+B3. Codice e descrizione dell'intervento 
+più frequente nelle auto del produttore BMW
 */
 
 
@@ -50,7 +52,14 @@ SELECT DISTINCT m.codice
 FROM Modello m
 JOIN Auto a ON m.codice = a.modello
 JOIN Riparazione r on a.targa = r.auto
-WHERE programmata;
+WHERE programmata
+AND NOT IN (
+    SELECT m1.codice
+    FROM Modello m1 
+    JOIN Auto a1 ON m1.codice = a1.modello
+    JOIN Riparazione r1 on a1.targa = r1.auto
+    WHERE NOT programmata
+)
 
 -- Query A2 
 
@@ -90,3 +99,24 @@ WHERE adpu.n_auto_prod_diverso = (
     FROM auto_diverse_per_utente adpu1
 );
 
+
+-- Query B3
+
+WITH interventi_bmw(codice, n_interventi) AS(
+    SELECT i.codice, count(a.*)
+    FROM Auto a 
+    JOIN Modello m ON a.modello = m.codice
+    JOIN Riparazione r ON a.targa = r.auto
+    JOIN DettaglioRiparazione dr ON r.codice = dr.riparazione
+    JOIN Intervento i ON dr.intervento = i.codice
+    WHERE m.produttore = 'BMW'
+    GROUP BY i.codice
+)
+
+SELECT i.codice, i.descrizione, ib.n_interventi
+FROM Intervento i
+JOIN interventi_bmw ib ON i.codice = ib.codice
+WHERE ib.n_interventi =(
+    SELECT MAX(ib1.n_interventi)
+    FROM interventi_bmw ib1
+)
